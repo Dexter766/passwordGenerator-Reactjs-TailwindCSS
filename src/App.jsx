@@ -2,25 +2,50 @@ import { useState, useCallback, useEffect, useRef } from "react";
 
 function App() {
   const [length, setLength] = useState(8);
-  const [num, setNum] = useState(false);
-  const [char, setChar] = useState(false);
+  const [numberAllowed, setNumberAllowed] = useState(false);
+  const [charAllowed, setCharAllowed] = useState(false);
   const [password, setPassword] = useState("");
 
   const passwordRef = useRef(null);
 
   const passwordGenerator = useCallback(() => {
-    let pass = "";
-    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    if (num) str += "0123456789";
-    if (char) str += "!@#$%^&*_+-=[]{}~`";
+    // let pass = "";
+    // let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    // if (num) str += "0123456789";
+    // if (char) str += "!@#$%^&*_+-=[]{}~`?";
 
-    for (let i = 1; i <= length; i++) {
-      let charRan = Math.floor(Math.random() * str.length + 1);
-      pass += str.charAt(charRan);
+    // for (let i = 1; i <= length; i++) {
+    //   let charRan = Math.floor(Math.random() * str.length + 1);
+    //   pass += str.charAt(charRan);
+    // }
+
+    // setPassword(pass);
+
+    let password = [];
+    for (let i = 0; i < Number(length); i++) {
+      password.push("");
     }
-
-    setPassword(pass);
-  }, [length, num, char, setPassword]);
+    let words = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    let numbers = "1234567890";
+    let characters = "?!@#$%^&*_+-=[]{}~`";
+    if (numberAllowed) {
+      let randomIndex = Math.floor(Math.random() * password.length);
+      password[randomIndex] =
+        numbers[Math.floor(Math.random() * numbers.length)];
+      words += numbers;
+    }
+    if (charAllowed) {
+      let randomIndex = Math.floor(Math.random() * password.length);
+      password[randomIndex] =
+        characters[Math.floor(Math.random() * characters.length)];
+      words += characters;
+    }
+    for (let i = 0; i < Number(length); i++) {
+      if (password[i] === "")
+        password[i] = words[Math.floor(Math.random() * words.length)];
+    }
+    setPassword(password.join(""));
+  }, [length, numberAllowed, charAllowed, setPassword]);
 
   const copyPassword = useCallback(() => {
     passwordRef.current?.select();
@@ -28,7 +53,10 @@ function App() {
     window.navigator.clipboard.writeText(password);
   }, [password]);
 
-  useEffect(() => passwordGenerator(), [length, num, char, passwordGenerator]);
+  useEffect(
+    () => passwordGenerator(),
+    [length, numberAllowed, charAllowed, passwordGenerator]
+  );
 
   return (
     <>
@@ -65,18 +93,18 @@ function App() {
           <div className="flex items-center gap-x-1">
             <input
               type="checkbox"
-              defaultChecked={num}
+              defaultChecked={numberAllowed}
               id="numInput"
-              onChange={() => setNum((prev) => !prev)}
+              onChange={() => setNumberAllowed((prev) => !prev)}
             />
             <label htmlFor="numInput">Numbers</label>
           </div>
           <div className="flex items-center gap-x-1">
             <input
               type="checkbox"
-              defaultChecked={char}
+              defaultChecked={charAllowed}
               id="charInput"
-              onChange={() => setChar((prev) => !prev)}
+              onChange={() => setCharAllowed((prev) => !prev)}
             />
             <label htmlFor="charInput">Characters</label>
           </div>
